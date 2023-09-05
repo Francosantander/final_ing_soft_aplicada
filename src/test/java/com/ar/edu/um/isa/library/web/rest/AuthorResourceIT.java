@@ -9,7 +9,6 @@ import com.ar.edu.um.isa.library.IntegrationTest;
 import com.ar.edu.um.isa.library.domain.Author;
 import com.ar.edu.um.isa.library.domain.Book;
 import com.ar.edu.um.isa.library.repository.AuthorRepository;
-import com.ar.edu.um.isa.library.service.criteria.AuthorCriteria;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
