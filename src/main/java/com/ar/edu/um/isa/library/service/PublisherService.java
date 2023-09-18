@@ -1,38 +1,38 @@
 package com.ar.edu.um.isa.library.service;
 
-import com.ar.edu.um.isa.library.domain.Publisher;
+import com.ar.edu.um.isa.library.service.dto.PublisherDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Service Interface for managing {@link Publisher}.
+ * Service Interface for managing {@link com.ar.edu.um.isa.library.domain.Publisher}.
  */
 public interface PublisherService {
     /**
      * Save a publisher.
      *
-     * @param publisher the entity to save.
+     * @param publisherDTO the entity to save.
      * @return the persisted entity.
      */
-    Publisher save(Publisher publisher);
+    PublisherDTO save(PublisherDTO publisherDTO);
 
     /**
      * Updates a publisher.
      *
-     * @param publisher the entity to update.
+     * @param publisherDTO the entity to update.
      * @return the persisted entity.
      */
-    Publisher update(Publisher publisher);
+    PublisherDTO update(PublisherDTO publisherDTO);
 
     /**
      * Partially updates a publisher.
      *
-     * @param publisher the entity to update partially.
+     * @param publisherDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<Publisher> partialUpdate(Publisher publisher);
+    Optional<PublisherDTO> partialUpdate(PublisherDTO publisherDTO);
 
     /**
      * Get all the publishers.
@@ -40,14 +40,14 @@ public interface PublisherService {
      * @param pageable the pagination information.
      * @return the list of entities.
      */
-    Page<Publisher> findAll(Pageable pageable);
+    Page<PublisherDTO> findAll(Pageable pageable);
 
     /**
-     * Get all the Publisher where Book is {@code null}.
+     * Get all the PublisherDTO where Book is {@code null}.
      *
      * @return the {@link List} of entities.
      */
-    List<Publisher> findAllWhereBookIsNull();
+    List<PublisherDTO> findAllWhereBookIsNull();
 
     /**
      * Get the "id" publisher.
@@ -55,7 +55,7 @@ public interface PublisherService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<Publisher> findOne(Long id);
+    Optional<PublisherDTO> findOne(Long id);
 
     /**
      * Delete the "id" publisher.

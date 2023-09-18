@@ -3,8 +3,12 @@ package com.ar.edu.um.isa.library.service.impl;
 import com.ar.edu.um.isa.library.domain.Client;
 import com.ar.edu.um.isa.library.repository.ClientRepository;
 import com.ar.edu.um.isa.library.service.ClientService;
+import com.ar.edu.um.isa.library.service.dto.ClientDTO;
+import com.ar.edu.um.isa.library.service.mapper.ClientMapper;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,55 +28,49 @@ public class ClientServiceImpl implements ClientService {
 
     private final ClientRepository clientRepository;
 
-    public ClientServiceImpl(ClientRepository clientRepository) {
+    private final ClientMapper clientMapper;
+
+    public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
+        this.clientMapper = clientMapper;
     }
 
     @Override
-    public Client save(Client client) {
-        log.debug("Request to save Client : {}", client);
-        return clientRepository.save(client);
+    public ClientDTO save(ClientDTO clientDTO) {
+        log.debug("Request to save Client : {}", clientDTO);
+        Client client = clientMapper.toEntity(clientDTO);
+        client = clientRepository.save(client);
+        return clientMapper.toDto(client);
     }
 
     @Override
-    public Client update(Client client) {
-        log.debug("Request to update Client : {}", client);
-        return clientRepository.save(client);
+    public ClientDTO update(ClientDTO clientDTO) {
+        log.debug("Request to update Client : {}", clientDTO);
+        Client client = clientMapper.toEntity(clientDTO);
+        client = clientRepository.save(client);
+        return clientMapper.toDto(client);
     }
 
     @Override
-    public Optional<Client> partialUpdate(Client client) {
-        log.debug("Request to partially update Client : {}", client);
+    public Optional<ClientDTO> partialUpdate(ClientDTO clientDTO) {
+        log.debug("Request to partially update Client : {}", clientDTO);
 
         return clientRepository
-            .findById(client.getId())
+            .findById(clientDTO.getId())
             .map(existingClient -> {
-                if (client.getFirstName() != null) {
-                    existingClient.setFirstName(client.getFirstName());
-                }
-                if (client.getLastName() != null) {
-                    existingClient.setLastName(client.getLastName());
-                }
-                if (client.getEmail() != null) {
-                    existingClient.setEmail(client.getEmail());
-                }
-                if (client.getAddress() != null) {
-                    existingClient.setAddress(client.getAddress());
-                }
-                if (client.getPhone() != null) {
-                    existingClient.setPhone(client.getPhone());
-                }
+                clientMapper.partialUpdate(existingClient, clientDTO);
 
                 return existingClient;
             })
-            .map(clientRepository::save);
+            .map(clientRepository::save)
+            .map(clientMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Client> findAll(Pageable pageable) {
+    public Page<ClientDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Clients");
-        return clientRepository.findAll(pageable);
+        return clientRepository.findAll(pageable).map(clientMapper::toDto);
     }
 
     /**
@@ -80,19 +78,20 @@ public class ClientServiceImpl implements ClientService {
      *  @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public List<Client> findAllWhereBorrowedBookIsNull() {
+    public List<ClientDTO> findAllWhereBorrowedBookIsNull() {
         log.debug("Request to get all clients where BorrowedBook is null");
         return StreamSupport
             .stream(clientRepository.findAll().spliterator(), false)
             .filter(client -> client.getBorrowedBook() == null)
-            .toList();
+            .map(clientMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Client> findOne(Long id) {
+    public Optional<ClientDTO> findOne(Long id) {
         log.debug("Request to get Client : {}", id);
-        return clientRepository.findById(id);
+        return clientRepository.findById(id).map(clientMapper::toDto);
     }
 
     @Override

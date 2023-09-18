@@ -92,6 +92,21 @@ Cypress.Commands.add('authenticatedRequest', data => {
   return cy.request(data);
 });
 
+Cypress.Commands.add('loginApi', () => {
+  const userData = { username: 'admin', password: 'admin', rememberMe: true };
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:8080/api/authenticate',
+    body: JSON.stringify(userData),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  }).then(resp => {
+    window.sessionStorage.setItem('jhi-authenticationToken', resp.body.id_token);
+  });
+});
+
 Cypress.Commands.add('login', (username: string, password: string) => {
   cy.session(
     [username, password],
@@ -122,6 +137,7 @@ declare global {
     interface Chainable {
       authenticatedRequest(data): Cypress.Chainable;
       login(username: string, password: string): Cypress.Chainable;
+      loginApi(): Cypress.Chainable;
     }
   }
 }

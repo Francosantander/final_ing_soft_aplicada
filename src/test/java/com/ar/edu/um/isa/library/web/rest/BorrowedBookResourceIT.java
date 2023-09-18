@@ -12,6 +12,8 @@ import com.ar.edu.um.isa.library.domain.BorrowedBook;
 import com.ar.edu.um.isa.library.domain.Client;
 import com.ar.edu.um.isa.library.repository.BorrowedBookRepository;
 import com.ar.edu.um.isa.library.service.BorrowedBookService;
+import com.ar.edu.um.isa.library.service.dto.BorrowedBookDTO;
+import com.ar.edu.um.isa.library.service.mapper.BorrowedBookMapper;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -58,6 +60,9 @@ class BorrowedBookResourceIT {
     @Mock
     private BorrowedBookRepository borrowedBookRepositoryMock;
 
+    @Autowired
+    private BorrowedBookMapper borrowedBookMapper;
+
     @Mock
     private BorrowedBookService borrowedBookServiceMock;
 
@@ -101,8 +106,11 @@ class BorrowedBookResourceIT {
     void createBorrowedBook() throws Exception {
         int databaseSizeBeforeCreate = borrowedBookRepository.findAll().size();
         // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
         restBorrowedBookMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBook)))
+            .perform(
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
+            )
             .andExpect(status().isCreated());
 
         // Validate the BorrowedBook in the database
@@ -117,12 +125,15 @@ class BorrowedBookResourceIT {
     void createBorrowedBookWithExistingId() throws Exception {
         // Create the BorrowedBook with an existing ID
         borrowedBook.setId(1L);
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
 
         int databaseSizeBeforeCreate = borrowedBookRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBorrowedBookMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBook)))
+            .perform(
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the BorrowedBook in the database
@@ -388,12 +399,13 @@ class BorrowedBookResourceIT {
         // Disconnect from session so that the updates on updatedBorrowedBook are not directly saved in db
         em.detach(updatedBorrowedBook);
         updatedBorrowedBook.borrowDate(UPDATED_BORROW_DATE);
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(updatedBorrowedBook);
 
         restBorrowedBookMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedBorrowedBook.getId())
+                put(ENTITY_API_URL_ID, borrowedBookDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedBorrowedBook))
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isOk());
 
@@ -410,12 +422,15 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, borrowedBook.getId())
+                put(ENTITY_API_URL_ID, borrowedBookDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(borrowedBook))
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -430,12 +445,15 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(borrowedBook))
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -450,9 +468,14 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBook)))
+            .perform(
+                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the BorrowedBook in the database
@@ -524,12 +547,15 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, borrowedBook.getId())
+                patch(ENTITY_API_URL_ID, borrowedBookDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(borrowedBook))
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -544,12 +570,15 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(borrowedBook))
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -564,10 +593,15 @@ class BorrowedBookResourceIT {
         int databaseSizeBeforeUpdate = borrowedBookRepository.findAll().size();
         borrowedBook.setId(count.incrementAndGet());
 
+        // Create the BorrowedBook
+        BorrowedBookDTO borrowedBookDTO = borrowedBookMapper.toDto(borrowedBook);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBorrowedBookMockMvc
             .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(borrowedBook))
+                patch(ENTITY_API_URL)
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(borrowedBookDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

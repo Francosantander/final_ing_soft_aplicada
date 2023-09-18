@@ -9,6 +9,8 @@ import com.ar.edu.um.isa.library.IntegrationTest;
 import com.ar.edu.um.isa.library.domain.Author;
 import com.ar.edu.um.isa.library.domain.Book;
 import com.ar.edu.um.isa.library.repository.AuthorRepository;
+import com.ar.edu.um.isa.library.service.dto.AuthorDTO;
+import com.ar.edu.um.isa.library.service.mapper.AuthorMapper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +46,9 @@ class AuthorResourceIT {
 
     @Autowired
     private AuthorRepository authorRepository;
+
+    @Autowired
+    private AuthorMapper authorMapper;
 
     @Autowired
     private EntityManager em;
@@ -85,8 +90,9 @@ class AuthorResourceIT {
     void createAuthor() throws Exception {
         int databaseSizeBeforeCreate = authorRepository.findAll().size();
         // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
         restAuthorMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Author in the database
@@ -102,12 +108,13 @@ class AuthorResourceIT {
     void createAuthorWithExistingId() throws Exception {
         // Create the Author with an existing ID
         author.setId(1L);
+        AuthorDTO authorDTO = authorMapper.toDto(author);
 
         int databaseSizeBeforeCreate = authorRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restAuthorMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Author in the database
@@ -123,9 +130,10 @@ class AuthorResourceIT {
         author.setFirstName(null);
 
         // Create the Author, which fails.
+        AuthorDTO authorDTO = authorMapper.toDto(author);
 
         restAuthorMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorDTO)))
             .andExpect(status().isBadRequest());
 
         List<Author> authorList = authorRepository.findAll();
@@ -140,9 +148,10 @@ class AuthorResourceIT {
         author.setLastName(null);
 
         // Create the Author, which fails.
+        AuthorDTO authorDTO = authorMapper.toDto(author);
 
         restAuthorMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorDTO)))
             .andExpect(status().isBadRequest());
 
         List<Author> authorList = authorRepository.findAll();
@@ -410,12 +419,13 @@ class AuthorResourceIT {
         // Disconnect from session so that the updates on updatedAuthor are not directly saved in db
         em.detach(updatedAuthor);
         updatedAuthor.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME);
+        AuthorDTO authorDTO = authorMapper.toDto(updatedAuthor);
 
         restAuthorMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedAuthor.getId())
+                put(ENTITY_API_URL_ID, authorDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedAuthor))
+                    .content(TestUtil.convertObjectToJsonBytes(authorDTO))
             )
             .andExpect(status().isOk());
 
@@ -433,12 +443,15 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restAuthorMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, author.getId())
+                put(ENTITY_API_URL_ID, authorDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(author))
+                    .content(TestUtil.convertObjectToJsonBytes(authorDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -453,12 +466,15 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(author))
+                    .content(TestUtil.convertObjectToJsonBytes(authorDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -473,9 +489,12 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Author in the database
@@ -549,12 +568,15 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restAuthorMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, author.getId())
+                patch(ENTITY_API_URL_ID, authorDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(author))
+                    .content(TestUtil.convertObjectToJsonBytes(authorDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -569,12 +591,15 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(author))
+                    .content(TestUtil.convertObjectToJsonBytes(authorDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -589,9 +614,14 @@ class AuthorResourceIT {
         int databaseSizeBeforeUpdate = authorRepository.findAll().size();
         author.setId(count.incrementAndGet());
 
+        // Create the Author
+        AuthorDTO authorDTO = authorMapper.toDto(author);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(author)))
+            .perform(
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(authorDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Author in the database

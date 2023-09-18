@@ -1,38 +1,38 @@
 package com.ar.edu.um.isa.library.service;
 
-import com.ar.edu.um.isa.library.domain.Client;
+import com.ar.edu.um.isa.library.service.dto.ClientDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Service Interface for managing {@link Client}.
+ * Service Interface for managing {@link com.ar.edu.um.isa.library.domain.Client}.
  */
 public interface ClientService {
     /**
      * Save a client.
      *
-     * @param client the entity to save.
+     * @param clientDTO the entity to save.
      * @return the persisted entity.
      */
-    Client save(Client client);
+    ClientDTO save(ClientDTO clientDTO);
 
     /**
      * Updates a client.
      *
-     * @param client the entity to update.
+     * @param clientDTO the entity to update.
      * @return the persisted entity.
      */
-    Client update(Client client);
+    ClientDTO update(ClientDTO clientDTO);
 
     /**
      * Partially updates a client.
      *
-     * @param client the entity to update partially.
+     * @param clientDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<Client> partialUpdate(Client client);
+    Optional<ClientDTO> partialUpdate(ClientDTO clientDTO);
 
     /**
      * Get all the clients.
@@ -40,14 +40,14 @@ public interface ClientService {
      * @param pageable the pagination information.
      * @return the list of entities.
      */
-    Page<Client> findAll(Pageable pageable);
+    Page<ClientDTO> findAll(Pageable pageable);
 
     /**
-     * Get all the Client where BorrowedBook is {@code null}.
+     * Get all the ClientDTO where BorrowedBook is {@code null}.
      *
      * @return the {@link List} of entities.
      */
-    List<Client> findAllWhereBorrowedBookIsNull();
+    List<ClientDTO> findAllWhereBorrowedBookIsNull();
 
     /**
      * Get the "id" client.
@@ -55,7 +55,7 @@ public interface ClientService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<Client> findOne(Long id);
+    Optional<ClientDTO> findOne(Long id);
 
     /**
      * Delete the "id" client.

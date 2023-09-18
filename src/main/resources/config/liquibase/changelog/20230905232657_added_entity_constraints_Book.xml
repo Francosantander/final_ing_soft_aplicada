@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity Book.
     -->
-    <changeSet id="20230905000456-2" author="jhipster">
+    <changeSet id="20230905232657-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="publisher_id"
                                  baseTableName="book"

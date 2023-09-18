@@ -12,7 +12,7 @@ export const sampleWithPartialData: IBorrowedBook = {
 
 export const sampleWithFullData: IBorrowedBook = {
   id: 30084,
-  borrowDate: dayjs('2023-09-04'),
+  borrowDate: dayjs('2023-09-05'),
 };
 
 export const sampleWithNewData: NewBorrowedBook = {

@@ -1,6 +1,7 @@
 {
   "applications": ["library"],
-  "changelogDate": "20230905000454",
+  "changelogDate": "20230905232655",
+  "dto": "mapstruct",
   "entityTableName": "author",
   "fields": [
     {

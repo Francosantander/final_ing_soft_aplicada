@@ -24,7 +24,7 @@ describe('Book e2e test', () => {
   });
 
   beforeEach(() => {
-    cy.intercept('GET', '/api/books+(?*|)').as('entitiesRequest');
+    cy.intercept('GET', '/4/books+(?*|)').as('entitiesRequest');
     cy.intercept('POST', '/api/books').as('postEntityRequest');
     cy.intercept('DELETE', '/api/books/*').as('deleteEntityRequest');
   });

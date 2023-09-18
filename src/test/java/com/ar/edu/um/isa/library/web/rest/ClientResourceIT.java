@@ -9,6 +9,8 @@ import com.ar.edu.um.isa.library.IntegrationTest;
 import com.ar.edu.um.isa.library.domain.BorrowedBook;
 import com.ar.edu.um.isa.library.domain.Client;
 import com.ar.edu.um.isa.library.repository.ClientRepository;
+import com.ar.edu.um.isa.library.service.dto.ClientDTO;
+import com.ar.edu.um.isa.library.service.mapper.ClientMapper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
@@ -53,6 +55,9 @@ class ClientResourceIT {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private ClientMapper clientMapper;
 
     @Autowired
     private EntityManager em;
@@ -104,8 +109,9 @@ class ClientResourceIT {
     void createClient() throws Exception {
         int databaseSizeBeforeCreate = clientRepository.findAll().size();
         // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
         restClientMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Client in the database
@@ -124,12 +130,13 @@ class ClientResourceIT {
     void createClientWithExistingId() throws Exception {
         // Create the Client with an existing ID
         client.setId(1L);
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         int databaseSizeBeforeCreate = clientRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restClientMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Client in the database
@@ -145,9 +152,10 @@ class ClientResourceIT {
         client.setFirstName(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         restClientMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
             .andExpect(status().isBadRequest());
 
         List<Client> clientList = clientRepository.findAll();
@@ -162,9 +170,10 @@ class ClientResourceIT {
         client.setLastName(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         restClientMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
             .andExpect(status().isBadRequest());
 
         List<Client> clientList = clientRepository.findAll();
@@ -642,12 +651,13 @@ class ClientResourceIT {
             .email(UPDATED_EMAIL)
             .address(UPDATED_ADDRESS)
             .phone(UPDATED_PHONE);
+        ClientDTO clientDTO = clientMapper.toDto(updatedClient);
 
         restClientMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedClient.getId())
+                put(ENTITY_API_URL_ID, clientDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedClient))
+                    .content(TestUtil.convertObjectToJsonBytes(clientDTO))
             )
             .andExpect(status().isOk());
 
@@ -668,12 +678,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restClientMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, client.getId())
+                put(ENTITY_API_URL_ID, clientDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(client))
+                    .content(TestUtil.convertObjectToJsonBytes(clientDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -688,12 +701,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restClientMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(client))
+                    .content(TestUtil.convertObjectToJsonBytes(clientDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -708,9 +724,12 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restClientMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Client in the database
@@ -795,12 +814,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restClientMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, client.getId())
+                patch(ENTITY_API_URL_ID, clientDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(client))
+                    .content(TestUtil.convertObjectToJsonBytes(clientDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -815,12 +837,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restClientMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(client))
+                    .content(TestUtil.convertObjectToJsonBytes(clientDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -835,9 +860,14 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restClientMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(client)))
+            .perform(
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(clientDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Client in the database

@@ -9,6 +9,8 @@ import com.ar.edu.um.isa.library.IntegrationTest;
 import com.ar.edu.um.isa.library.domain.Book;
 import com.ar.edu.um.isa.library.domain.Publisher;
 import com.ar.edu.um.isa.library.repository.PublisherRepository;
+import com.ar.edu.um.isa.library.service.dto.PublisherDTO;
+import com.ar.edu.um.isa.library.service.mapper.PublisherMapper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +43,9 @@ class PublisherResourceIT {
 
     @Autowired
     private PublisherRepository publisherRepository;
+
+    @Autowired
+    private PublisherMapper publisherMapper;
 
     @Autowired
     private EntityManager em;
@@ -82,8 +87,9 @@ class PublisherResourceIT {
     void createPublisher() throws Exception {
         int databaseSizeBeforeCreate = publisherRepository.findAll().size();
         // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
         restPublisherMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisher)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisherDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Publisher in the database
@@ -98,12 +104,13 @@ class PublisherResourceIT {
     void createPublisherWithExistingId() throws Exception {
         // Create the Publisher with an existing ID
         publisher.setId(1L);
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
 
         int databaseSizeBeforeCreate = publisherRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPublisherMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisher)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisherDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Publisher in the database
@@ -119,9 +126,10 @@ class PublisherResourceIT {
         publisher.setName(null);
 
         // Create the Publisher, which fails.
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
 
         restPublisherMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisher)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisherDTO)))
             .andExpect(status().isBadRequest());
 
         List<Publisher> publisherList = publisherRepository.findAll();
@@ -322,12 +330,13 @@ class PublisherResourceIT {
         // Disconnect from session so that the updates on updatedPublisher are not directly saved in db
         em.detach(updatedPublisher);
         updatedPublisher.name(UPDATED_NAME);
+        PublisherDTO publisherDTO = publisherMapper.toDto(updatedPublisher);
 
         restPublisherMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedPublisher.getId())
+                put(ENTITY_API_URL_ID, publisherDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedPublisher))
+                    .content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isOk());
 
@@ -344,12 +353,15 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPublisherMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, publisher.getId())
+                put(ENTITY_API_URL_ID, publisherDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(publisher))
+                    .content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -364,12 +376,15 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPublisherMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(publisher))
+                    .content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -384,9 +399,12 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPublisherMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisher)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(publisherDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Publisher in the database
@@ -456,12 +474,15 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPublisherMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, publisher.getId())
+                patch(ENTITY_API_URL_ID, publisherDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(publisher))
+                    .content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -476,12 +497,15 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPublisherMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(publisher))
+                    .content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -496,10 +520,13 @@ class PublisherResourceIT {
         int databaseSizeBeforeUpdate = publisherRepository.findAll().size();
         publisher.setId(count.incrementAndGet());
 
+        // Create the Publisher
+        PublisherDTO publisherDTO = publisherMapper.toDto(publisher);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPublisherMockMvc
             .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(publisher))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(publisherDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
