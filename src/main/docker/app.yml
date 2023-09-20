@@ -1,29 +1,64 @@
 # This configuration is intended for development purpose, it's **your** responsibility to harden it for production
-name: library
+version: '3.8'
 services:
-  app:
+  library-app:
+    container_name: library-app
     image: library
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
       - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/library?useLegacyDatetimeCode=false&serverTimezone=UTC
-      - SPRING_LIQUIBASE_URL=jdbc:mariadb://mariadb:3306/library?useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb-library:3306/library?useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_LIQUIBASE_URL=jdbc:mariadb://mariadb-library:3306/library?useLegacyDatetimeCode=false&serverTimezone=UTC
+      - JHIPSTER_SLEEP=15
     ports:
-      - 127.0.0.1:8080:8080
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:8080/management/health
-      interval: 5s
-      timeout: 5s
-      retries: 40
+      - 8080:8080
+    restart: unless-stopped
     depends_on:
-      mariadb:
-        condition: service_healthy
-  mariadb:
-    extends:
-      file: ./mariadb.yml
-      service: mariadb
+      - mariadb-library
+
+  mariadb-library:
+    container_name: mariadb
+    image: mariadb:11.0.2
+    volumes:
+      - ./config/mariadb:/etc/mariadb/conf.d
+    # volumes:
+    #   - ~/volumes/jhipster/library/mariadb/:/var/lib/mariadb/
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=library
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 3306:3306
+    command: mariadbd --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+  
+  elk:
+    image: sebp/elk
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+    networks:
+      - elkf-networks
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.15.0
+    # https://github.com/docker/swarmkit/issues/1951
+    # Need to override user so we can access the log files, and docker.sock
+    user: root
+    networks:
+      - elkf-networks
+    volumes:
+      - ../../../filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+
+networks:
+  elkf-networks:
+    driver: 'bridge'

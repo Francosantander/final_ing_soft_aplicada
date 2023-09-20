@@ -1,14 +1,8 @@
 import {
-    accountMenuSelector,
-    adminMenuSelector,
-    loginItemSelector,
-    navbarSelector,
     passwordLoginSelector,
     submitLoginSelector,
-    submitSettingsSelector,
     usernameLoginSelector,
   } from '../../support/commands';
-  import { entityDetailsButtonSelector } from '../../support/entity';
 
 describe('/admin', () => {
     before(() => {
