@@ -20,7 +20,7 @@ describe('/admin', () => {
     describe('/settings', () => {
       it('Language should be English', () => {
         cy.clickOnLoginItem();
-        cy.get(usernameLoginSelector).click().type('admin');
+        cy.get(usernameLoginSelector).type('admin');
         cy.get(passwordLoginSelector).type('admin');
         cy.get(submitLoginSelector).click();
         cy.clickOnSettingsItem();
@@ -29,12 +29,12 @@ describe('/admin', () => {
   
       it('Can change name and email', () => {
         cy.clickOnLoginItem();
-        cy.get(usernameLoginSelector).click().type('admin');
+        cy.get(usernameLoginSelector).type('admin');
         cy.get(passwordLoginSelector).type('admin');
         cy.get(submitLoginSelector).click();
         cy.clickOnSettingsItem();
-        cy.get('[data-cy=firstname]').clear().type('AdminFranco');
-        cy.get('[data-cy=email]').clear().type('adminfranco@localhost.com');
+        cy.get('[data-cy=firstname]').invoke('val', '').type('AdminFranco');
+        cy.get('[data-cy=email]').invoke('val', '').type('adminfranco@localhost.com');
         cy.get('[data-cy=submit]').click();
         cy.visit('/');
         cy.clickOnSettingsItem();
