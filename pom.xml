@@ -421,8 +421,15 @@
                                 </platform>
                             </platforms>
                         </from>
-                        <to>
+                        <!-- <to>
                             <image>library:latest</image>
+                        </to> -->
+                        <to>
+                            <image>francosanta16/isa-library:latest</image>
+                            <auth>
+                                <username>${DOCKER_REGISTRY_USER}</username>
+                                <password>${DOCKER_REGISTRY_PWD}</password>
+                            </auth>
                         </to>
                         <container>
                             <entrypoint>

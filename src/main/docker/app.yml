@@ -20,8 +20,8 @@ services:
   mariadb-library:
     container_name: mariadb
     image: mariadb:11.0.2
-    volumes:
-      - ./config/mariadb:/etc/mariadb/conf.d
+    # volumes:
+    #   - ./config/mariadb:/etc/mariadb/conf.d
     # volumes:
     #   - ~/volumes/jhipster/library/mariadb/:/var/lib/mariadb/
     environment:
@@ -58,6 +58,14 @@ services:
       - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
     # disable strict permission checks
     command: ["--strict.perms=false"]
+
+  pwa:
+    container_name: pwa
+    build:
+      context: ../../../../final-isa-pwa
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
 
 networks:
   elkf-networks:
